@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>절대 누르지 마시오</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #121212;
+            color: #ffffff;
+            font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+            overflow: hidden;
+            transition: background-color 0.3s;
+        }
+        .container {
+            text-align: center;
+            padding: 20px;
+            max-width: 400px;
+            width: 90%;
+        }
+        .counter {
+            font-size: 1.1rem;
+            color: #888888;
+            margin-bottom: 30px;
+            min-height: 24px;
+        }
+        .msg-box {
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            font-weight: bold;
+            line-height: 1.5;
+            margin-bottom: 40px;
+            color: #f1f1f1;
+            word-break: keep-all;
+        }
+        .btn-wrapper {
+            position: relative;
+            height: 180px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .magic-btn {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #ff4b4b, #dc3545);
+            border: none;
+            color: white;
+            font-size: 1.3rem;
+            font-weight: bold;
+            box-shadow: 0 10px 25px rgba(220, 53, 69, 0.5);
+            cursor: pointer;
+            outline: none;
+            transition: transform 0.15s ease, background 0.3s;
+        }
+        .magic-btn:active {
+            transform: scale(0.92);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="counter" id="counterText">누른 횟수: 0</div>
+    <div class="msg-box" id="msgBox">절대로 아래 버튼을 누르지 마세요.</div>
+    
+    <div class="btn-wrapper">
+        <button class="magic-btn" id="btn" onclick="handleClick()">누르지마</button>
+    </div>
+</div>
+
+<script>
+    let count = 0;
+    const btn = document.getElementById('btn');
+    const msgBox = document.getElementById('msgBox');
+    const counterText = document.getElementById('counterText');
+
+    // 웹 오디오 효과음 생성 함수 (외부 파일 없이 작동)
+    function playBeep(freq = 440, type = 'sine', duration = 0.15) {
+        try {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        } catch (e) {}
+    }
+
+    const messages = [
+        "하지 말라고 하면 더 하고 싶죠?",
+        "어허, 손가락 치우세요.",
+        "진짜 또 누르네... 말 안 듣는 스타일이시군요?",
+        "버튼도 쉴 권리가 있습니다.",
+        "방금 터치로 배터리가 0.001% 소모되었습니다.",
+        "계속 누르셔도 아무 일도 안 일어납니다.",
+        "진짜로요.",
+        "정말로 아무 일도 안 난다니까요?",
+        "아... 고집 세시네 정말 ㅋㅋㅋ",
+        "자, 10번 넘게 누르셨으니 친구한테 맛있는 거 사달라고 하세요.",
+        "버튼이 살짝 아파합니다 🥺",
+        "잠시만요, 버튼이 도망갈 준비 중입니다.",
+        "후... 눌러서 시원하십니까?",
+        "이 앱 만든 사람도 왜 만드셨는지 궁금해하는 중입니다.",
+        "오, 방금 누른 건 인정. 손가락 폼이 아주 좋았어요.",
+        "버튼을 자꾸 누르시면... 아무 일도 안 일어납니다!",
+        "축하합니다! 무의미하게 버튼 누르기 칭호를 획득하셨습니다 🏆",
+        "이제 그만 누르고 옆 사람 얼굴 한번 보고 씨익 웃어주세요 😊"
+    ];
+
+    function handleClick() {
+        count++;
+        counterText.innerText = `누른 횟수: ${count}`;
+        
+        // 효과음 및 무작위 메시지 출력
+        playBeep(300 + (count * 20) % 500, 'triangle', 0.15);
+
+        if (count <= messages.length) {
+            msgBox.innerText = messages[count - 1];
+        } else {
+            const randomMsg = messages[Math.floor(Math.random() * messages.length)];
+            msgBox.innerText = randomMsg;
+        }
+
+        // 연출 효과 (소소하게 웃긴 움직임)
+        if (count % 5 === 0) {
+            document.body.style.backgroundColor = '#1e1e2f';
+            setTimeout(() => document.body.style.backgroundColor = '#121212', 300);
+        }
+
+        if (count % 7 === 0) {
+            btn.style.transform = 'rotate(180deg)';
+            setTimeout(() => btn.style.transform = 'rotate(0deg)', 400);
+        }
+    }
+</script>
+
+</body>
+</html>
